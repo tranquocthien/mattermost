@@ -5,8 +5,11 @@ package model
 
 import (
 	"fmt"
+	"runtime/debug"
 	"strconv"
 	"strings"
+
+	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
 // This is a list of all the current versions including any patches.
@@ -115,8 +118,8 @@ var versions = []string{
 
 var CurrentVersion = versions[0]
 var BuildNumber string
-var BuildDate string
-var BuildHash string
+var BuildDate string // DONE
+var BuildHash string // DONE
 var BuildHashEnterprise string
 var BuildEnterpriseReady string
 var versionsWithoutHotFixes []string
@@ -132,6 +135,21 @@ func init() {
 		if seen[verStr] == "" {
 			versionsWithoutHotFixes = append(versionsWithoutHotFixes, verStr)
 			seen[verStr] = verStr
+		}
+	}
+
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		mlog.Warn("failed to get build info")
+		return
+	}
+
+	for _, s := range info.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			BuildHash = s.Value
+		case "vcs.time":
+			BuildDate = s.Value
 		}
 	}
 }
