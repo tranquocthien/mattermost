@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {AnyAction} from 'redux';
+import {batchActions} from 'redux-batched-actions';
+
 import {Client4} from 'mattermost-redux/client';
 import {EmojiTypes} from 'mattermost-redux/action_types';
 import {General, Emoji} from '../constants';
@@ -8,7 +11,7 @@ import {General, Emoji} from '../constants';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'mattermost-redux/selectors/entities/emojis';
 import {parseNeededCustomEmojisFromText} from 'mattermost-redux/utils/emoji_utils';
 
-import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'mattermost-redux/types/actions';
+import {GetStateFunc, DispatchFunc, ActionFunc} from 'mattermost-redux/types/actions';
 
 import {CustomEmoji} from '@mattermost/types/emojis';
 
@@ -75,17 +78,48 @@ export function getCustomEmojiByName(name: string): ActionFunc {
 }
 
 export function getCustomEmojisByName(names: string[]): ActionFunc {
-    return async (dispatch: DispatchFunc) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         console.log('HARRISON getCustomEmojisByName', names);
         if (!names || names.length === 0) {
-            return {data: true};
+            return {data: false};
         }
 
-        const promises: Array<Promise<ActionResult|ActionResult[]>> = [];
-        names.forEach((name) => promises.push(dispatch(getCustomEmojiByName(name)))); // TODO batch me
+        let data;
+        try {
+            data = await Client4.getCustomEmojisByNames(names);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
 
-        await Promise.all(promises);
-        return {data: true};
+        const actions: AnyAction[] = [{
+            type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
+            data,
+        }];
+
+        if (data.length !== names.length) {
+            // HARRISON TODO do I care enough to make this not polynomial time?
+            for (const name of names) {
+                let found = false;
+
+                for (const emoji of data) {
+                    if (emoji.name === name) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    actions.push({
+                        type: EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST,
+                        data: name,
+                    });
+                }
+            }
+        }
+
+        return dispatch(actions.length > 1 ? batchActions(actions) : actions[0]);
     };
 }
 

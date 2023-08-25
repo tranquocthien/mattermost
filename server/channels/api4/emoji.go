@@ -22,6 +22,7 @@ const (
 func (api *API) InitEmoji() {
 	api.BaseRoutes.Emojis.Handle("", api.APISessionRequired(createEmoji)).Methods("POST")
 	api.BaseRoutes.Emojis.Handle("", api.APISessionRequired(getEmojiList)).Methods("GET")
+	api.BaseRoutes.Emojis.Handle("/names", api.APISessionRequired(getEmojisByNames)).Methods("POST") // HARRISON TODO test me
 	api.BaseRoutes.Emojis.Handle("/search", api.APISessionRequired(searchEmojis)).Methods("POST")
 	api.BaseRoutes.Emojis.Handle("/autocomplete", api.APISessionRequired(autocompleteEmojis)).Methods("GET")
 	api.BaseRoutes.Emoji.Handle("", api.APISessionRequired(deleteEmoji)).Methods("DELETE")
@@ -221,6 +222,11 @@ func getEmojiByName(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !*c.App.Config().ServiceSettings.EnableCustomEmoji {
+		c.Err = model.NewAppError("getEmojiByName", "api.emoji.disabled.app_error", nil, "", http.StatusNotImplemented)
+		return
+	}
+
 	emoji, err := c.App.GetEmojiByName(c.AppContext, c.Params.EmojiName)
 	if err != nil {
 		c.Err = err
@@ -228,6 +234,29 @@ func getEmojiByName(c *Context, w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(emoji); err != nil {
+		c.Logger.Warn("Error while writing response", mlog.Err(err))
+	}
+}
+
+func getEmojisByNames(c *Context, w http.ResponseWriter, r *http.Request) {
+	names := model.ArrayFromJSON(r.Body)
+	if len(names) == 0 {
+		c.SetInvalidParam("names")
+		return
+	}
+
+	if !*c.App.Config().ServiceSettings.EnableCustomEmoji {
+		c.Err = model.NewAppError("getEmojisByNames", "api.emoji.disabled.app_error", nil, "", http.StatusNotImplemented)
+		return
+	}
+
+	emojis, err := c.App.GetMultipleEmojiByName(c.AppContext, names)
+	if err != nil {
+		c.Err = err
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(emojis); err != nil {
 		c.Logger.Warn("Error while writing response", mlog.Err(err))
 	}
 }
