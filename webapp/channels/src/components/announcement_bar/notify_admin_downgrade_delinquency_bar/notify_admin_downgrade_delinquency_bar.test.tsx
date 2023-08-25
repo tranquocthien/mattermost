@@ -21,7 +21,7 @@ import NotifyAdminDowngradeDeliquencyBar, {BannerPreferenceName} from './index';
 
 type RenderComponentArgs = {
     props?: Partial<ComponentProps<typeof NotifyAdminDowngradeDeliquencyBar>>;
-    store?: any;
+    state?: any;
 }
 
 jest.mock('actions/telemetry_actions', () => ({
@@ -90,9 +90,11 @@ describe('components/announcement_bar/notify_admin_downgrade_delinquency_bar', (
         },
     };
 
-    const renderComponent = ({store = initialState}: RenderComponentArgs) => {
+    const renderComponent = ({state = initialState}: RenderComponentArgs) => {
+        const {store} = configureStore(state);
+
         return renderWithIntl(
-            <reactRedux.Provider store={configureStore(store)}>
+            <reactRedux.Provider store={store}>
                 <NotifyAdminDowngradeDeliquencyBar/>
             </reactRedux.Provider>,
         );
@@ -110,7 +112,7 @@ describe('components/announcement_bar/notify_admin_downgrade_delinquency_bar', (
             is_free_trial: 'false',
         };
 
-        renderComponent({store: state});
+        renderComponent({state});
 
         expect(screen.queryByText('Your workspace has been downgraded. Notify your admin to fix billing issues')).not.toBeInTheDocument();
     });
@@ -135,7 +137,7 @@ describe('components/announcement_bar/notify_admin_downgrade_delinquency_bar', (
             ],
         );
 
-        renderComponent({store: state});
+        renderComponent({state});
 
         expect(screen.queryByText('Your workspace has been downgraded. Notify your admin to fix billing issues')).not.toBeInTheDocument();
     });
@@ -152,7 +154,7 @@ describe('components/announcement_bar/notify_admin_downgrade_delinquency_bar', (
             ],
         );
 
-        renderComponent({store: state});
+        renderComponent({state});
 
         expect(screen.queryByText('Your workspace has been downgraded. Notify your admin to fix billing issues')).not.toBeInTheDocument();
     });
@@ -162,7 +164,7 @@ describe('components/announcement_bar/notify_admin_downgrade_delinquency_bar', (
         const state = JSON.parse(JSON.stringify(initialState));
         state.entities.users.profiles.current_user_id = {roles: 'system_admin'};
 
-        renderComponent({store: state});
+        renderComponent({state});
 
         expect(screen.queryByText('Your workspace has been downgraded. Notify your admin to fix billing issues')).not.toBeInTheDocument();
     });

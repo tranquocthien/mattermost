@@ -102,7 +102,7 @@ jest.mock('react-dom', () => ({
 describe('useShowAdminLimitReached', () => {
     it('opens cloud usage modal if admin has just logged in on a cloud instance, the instance has exceeded its message history limit, and the admin has not been shown the modal on log in before.', () => {
         const state = JSON.parse(JSON.stringify(openModalState));
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         renderWithIntl(
             <Provider store={store}>
                 <div id='root-portal'/>
@@ -125,7 +125,7 @@ describe('useShowAdminLimitReached', () => {
             ],
             'admin',
         );
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         renderWithIntl(
             <Provider store={store}>
                 <div id='root-portal'/>
@@ -139,7 +139,7 @@ describe('useShowAdminLimitReached', () => {
     it('does not open cloud usage modal if workspace has not exceeded limit', () => {
         const state = JSON.parse(JSON.stringify(openModalState));
         state.entities.usage.messages.history = 10000;
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         renderWithIntl(
             <Provider store={store}>
                 <div id='root-portal'/>
@@ -153,7 +153,7 @@ describe('useShowAdminLimitReached', () => {
     it('does not open cloud usage modal if there is no message limit', () => {
         const state = JSON.parse(JSON.stringify(openModalState));
         state.entities.cloud.limits = {};
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         renderWithIntl(
             <Provider store={store}>
                 <div id='root-portal'/>
@@ -167,7 +167,7 @@ describe('useShowAdminLimitReached', () => {
     it('does not open cloud usage modal if there is no message limit', () => {
         const state = JSON.parse(JSON.stringify(openModalState));
         state.entities.cloud.limits = {};
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         renderWithIntl(
             <Provider store={store}>
                 <div id='root-portal'/>
@@ -181,7 +181,7 @@ describe('useShowAdminLimitReached', () => {
     it('does not open cloud usage modal if admin was already logged in', () => {
         const state = JSON.parse(JSON.stringify(openModalState));
         state.views.admin.needsLoggedInLimitReachedCheck = false;
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         renderWithIntl(
             <Provider store={store}>
                 <div id='root-portal'/>
@@ -195,7 +195,7 @@ describe('useShowAdminLimitReached', () => {
     it('does not open cloud usage modal if limits are not yet loaded', () => {
         const state = JSON.parse(JSON.stringify(openModalState));
         state.entities.cloud.limits.limitsLoaded = false;
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         jest.spyOn(useGetLimitsHook, 'default').mockImplementation(() => ([
             state.entities.cloud.limits.limits,
             false,
@@ -216,7 +216,7 @@ describe('useShowAdminLimitReached', () => {
             history: 0,
             historyLoaded: false,
         };
-        const store = configureStore(state);
+        const {store} = configureStore(state);
         jest.spyOn(useGetUsageHook, 'default').mockImplementation(() => state.entities.usage);
         renderWithIntl(
             <Provider store={store}>

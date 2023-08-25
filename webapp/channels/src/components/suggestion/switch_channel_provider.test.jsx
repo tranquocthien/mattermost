@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {getState} from 'stores/redux_store';
+import baseStore from 'stores/redux_store';
 
 import mockStore from 'tests/test_store';
 
@@ -17,10 +17,7 @@ const latestPost = {
     create_at: Date.now(),
 };
 
-jest.mock('stores/redux_store', () => ({
-    dispatch: jest.fn(),
-    getState: jest.fn(),
-}));
+jest.mock('stores/redux_store');
 
 jest.mock('mattermost-redux/client', () => {
     const original = jest.requireActual('mattermost-redux/client');
@@ -48,6 +45,8 @@ jest.mock('mattermost-redux/actions/channels', () => ({
         ],
     })),
 }));
+
+const {getState} = baseStore;
 
 describe('components/SwitchChannelProvider', () => {
     const defaultState = {

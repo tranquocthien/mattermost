@@ -80,7 +80,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Should show the modal if the admin hasn\'t a preference', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-12-20'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -107,7 +107,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
 
         jest.useFakeTimers().setSystemTime(new Date('2022-12-20'));
 
-        const store = configureStore(state);
+        const {store} = configureStore(state);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -123,7 +123,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Should show the modal if the deliquency_since is equal 90 days', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-08-16'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -139,7 +139,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Should show the modal if the deliquency_since is more than 90 days', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-08-17'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -155,7 +155,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Shouldn\'t show the modal if the deliqeuncy_since is less than 90 days', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-08-15'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -171,7 +171,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Should show the modal if the license is cloud', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-08-17'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -193,7 +193,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
 
         jest.useFakeTimers().setSystemTime(new Date('2022-12-20'));
 
-        const store = configureStore(state);
+        const {store} = configureStore(state);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -215,7 +215,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
 
         jest.useFakeTimers().setSystemTime(new Date('2022-12-20'));
 
-        const store = configureStore(state);
+        const {store} = configureStore(state);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -231,7 +231,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Should show the modal if the user is an admin', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-08-17'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -254,7 +254,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
         };
         jest.useFakeTimers().setSystemTime(new Date('2022-12-20'));
 
-        const store = configureStore(state);
+        const {store} = configureStore(state);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -270,7 +270,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
     it('Should show the modal if the user just logged in', () => {
         jest.useFakeTimers().setSystemTime(new Date('2022-08-17'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -286,7 +286,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
         (StorageSelectors.makeGetItem as jest.Mock).mockReturnValue(() => true);
         jest.useFakeTimers().setSystemTime(new Date('2022-08-17'));
 
-        const store = configureStore(initialState);
+        const {store} = configureStore(initialState);
 
         renderWithIntl(
             <reactRedux.Provider store={store}>
@@ -305,7 +305,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
         const newState = JSON.parse(JSON.stringify(initialState));
         newState.entities.cloud.products = {};
 
-        const store = configureStore(newState);
+        const {store} = configureStore(newState);
         const getCloudProds = jest.spyOn(cloudActions, 'getCloudProducts').mockImplementationOnce(jest.fn().mockReturnValue({type: 'mock_impl'}));
 
         renderWithIntl(
@@ -329,7 +329,7 @@ describe('components/delinquency_modal/delinquency_modal_controller', () => {
             Cloud: 'false',
         };
 
-        const store = configureStore(newState);
+        const {store} = configureStore(newState);
         const getCloudProds = jest.spyOn(cloudActions, 'getCloudProducts').mockImplementationOnce(jest.fn().mockReturnValue({type: 'mock_impl'}));
 
         renderWithIntl(

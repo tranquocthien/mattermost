@@ -2,11 +2,9 @@
 // See LICENSE.txt for license information.
 
 import React, {ComponentProps} from 'react';
-import * as reactRedux from 'react-redux';
 
-import {fireEvent, renderWithIntl, screen} from 'tests/react_testing_utils';
+import {fireEvent, renderWithFullContext, screen} from 'tests/react_testing_utils';
 import {trackEvent} from 'actions/telemetry_actions';
-import configureStore from 'store';
 import {ModalIdentifiers, TELEMETRY_CATEGORIES} from 'utils/constants';
 import useGetMultiplesExceededCloudLimit from 'components/common/hooks/useGetMultiplesExceededCloudLimit';
 import {LimitTypes} from 'utils/limits';
@@ -30,7 +28,7 @@ jest.mock('react-redux', () => ({
 jest.mock('components/common/hooks/useGetMultiplesExceededCloudLimit');
 
 describe('components/delinquency_modal/freemium_modal', () => {
-    const initialStates = {
+    const initialState = {
         views: {
             modals: {
                 modalState: {
@@ -43,7 +41,7 @@ describe('components/delinquency_modal/freemium_modal', () => {
                             isAdminConsole: false,
                         },
                         dialogType: React.Fragment,
-                    },
+                    } as any,
                 },
                 showLaunchingWorkspace: false,
             },
@@ -58,7 +56,7 @@ describe('components/delinquency_modal/freemium_modal', () => {
         },
     };
 
-    const renderComponent = ({props = {}, store = configureStore(initialStates)}: RenderComponentArgs) => {
+    const renderComponent = ({props = {}}: RenderComponentArgs) => {
         const defaultProps: ComponentProps<typeof FreemiumModal> = {
             onClose: jest.fn(),
             planName: 'planName',
@@ -66,13 +64,12 @@ describe('components/delinquency_modal/freemium_modal', () => {
             onExited: jest.fn(),
         };
 
-        return renderWithIntl(
-            <reactRedux.Provider store={store}>
-                <FreemiumModal
-                    {...defaultProps}
-                    {...props}
-                />
-            </reactRedux.Provider>,
+        return renderWithFullContext(
+            <FreemiumModal
+                {...defaultProps}
+                {...props}
+            />,
+            initialState,
         );
     };
 

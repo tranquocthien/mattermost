@@ -30,7 +30,7 @@ export const renderWithIntlAndStore = (component: React.ReactNode | React.ReactN
     // We use a redux-mock-store store for testing, but we set up a real store to ensure the initial state is complete
     const realStore = configureStore(initialState);
 
-    const store = mockStore(realStore.getState());
+    const store = mockStore(realStore.store.getState());
 
     return render(
         <IntlProvider locale={locale}>
@@ -44,7 +44,7 @@ export const renderWithIntlAndStore = (component: React.ReactNode | React.ReactN
 
 export const renderWithFullContext = (component: React.ReactNode | React.ReactNodeArray, initialState: DeepPartial<GlobalState> = {}, locale = 'en') => {
     // We use a redux-mock-store store for testing, but we set up a real store to ensure the initial state is complete
-    const testState = configureStore(initialState).getState();
+    const testState = configureStore(initialState).store.getState();
 
     // Store these in an object so that they can be maintained through rerenders
     const renderState = {
@@ -85,7 +85,7 @@ export const renderWithFullContext = (component: React.ReactNode | React.ReactNo
          * Rerenders the component after replacing the entire store state with the provided one.
          */
         replaceStoreState: (newInitialState: DeepPartial<GlobalState>) => {
-            const newTestState = configureStore(newInitialState).getState();
+            const newTestState = configureStore(newInitialState).store.getState();
             renderState.state = newTestState;
             renderState.store = mockStore(newTestState);
 

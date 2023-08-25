@@ -5,19 +5,19 @@ import * as Actions from 'actions/storage';
 import configureStore from 'store';
 
 describe('Actions.Storage', () => {
-    let store = configureStore();
-    beforeEach(async () => {
-        store = await configureStore();
+    let store = configureStore().store;
+    beforeEach(() => {
+        store = configureStore().store;
     });
 
-    it('setItem', async () => {
+    it('setItem', () => {
         store.dispatch(Actions.setItem('test', 'value'));
 
         expect(store.getState().storage.storage.unknown_test.value).toBe('value');
         expect(typeof store.getState().storage.storage.unknown_test.timestamp).not.toBe('undefined');
     });
 
-    it('removeItem', async () => {
+    it('removeItem', () => {
         store.dispatch(Actions.setItem('test1', 'value1'));
         store.dispatch(Actions.setItem('test2', 'value2'));
 
@@ -30,14 +30,14 @@ describe('Actions.Storage', () => {
         expect(store.getState().storage.storage.unknown_test2.value).toBe('value2');
     });
 
-    it('setGlobalItem', async () => {
+    it('setGlobalItem', () => {
         store.dispatch(Actions.setGlobalItem('test', 'value'));
 
         expect(store.getState().storage.storage.test.value).toBe('value');
         expect(typeof store.getState().storage.storage.test.timestamp).not.toBe('undefined');
     });
 
-    it('removeGlobalItem', async () => {
+    it('removeGlobalItem', () => {
         store.dispatch(Actions.setGlobalItem('test1', 'value1'));
         store.dispatch(Actions.setGlobalItem('test2', 'value2'));
 
@@ -50,7 +50,7 @@ describe('Actions.Storage', () => {
         expect(store.getState().storage.storage.test2.value).toBe('value2');
     });
 
-    it('actionOnGlobalItemsWithPrefix', async () => {
+    it('actionOnGlobalItemsWithPrefix', () => {
         const touchedPairs: Array<[string, number]> = [];
 
         store.dispatch(Actions.setGlobalItem('prefix_test1', 1));

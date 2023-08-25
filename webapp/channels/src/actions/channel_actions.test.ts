@@ -301,7 +301,7 @@ describe('Actions.Channel', () => {
         });
 
         test('should throws error when response errors out', async () => {
-            const store = configureStore();
+            const {store} = configureStore();
 
             nock(Client4.getGraphQLUrl()).
                 post('').reply(200, {
@@ -316,7 +316,7 @@ describe('Actions.Channel', () => {
         test('should throws error when response is not correct', async () => {
             [null, undefined, {}].
                 forEach(async (dataResponse) => {
-                    const store = configureStore();
+                    const {store} = configureStore();
 
                     nock(Client4.getGraphQLUrl()).
                         post('').reply(200, {
@@ -332,7 +332,7 @@ describe('Actions.Channel', () => {
         test('should throws not throw error when responses are empty', async () => {
             [[[], []], [[fakeGQLChannelWithId('team1')], []], [[], [fakeGQLChannelMember('user1', 'channel2', [role1])]]].
                 forEach(async ([channelResponse, channelMemberResponse]) => {
-                    const store = configureStore();
+                    const {store} = configureStore();
 
                     nock(Client4.getGraphQLUrl()).
                         post('').
@@ -350,7 +350,7 @@ describe('Actions.Channel', () => {
         });
 
         test('should return correct channels, channel members and roles when under max limit', async () => {
-            const store = configureStore();
+            const {store} = configureStore();
 
             const perPage = Math.floor(CHANNELS_AND_CHANNEL_MEMBERS_PER_PAGE / 2);
 
@@ -383,7 +383,7 @@ describe('Actions.Channel', () => {
         });
 
         test('should return correct channels, channel members, roles when responses span across multiple pages', async () => {
-            const store = configureStore();
+            const {store} = configureStore();
 
             const p1Page = CHANNELS_AND_CHANNEL_MEMBERS_PER_PAGE;
             const p2Page = CHANNELS_AND_CHANNEL_MEMBERS_PER_PAGE;
@@ -426,7 +426,7 @@ describe('Actions.Channel', () => {
         });
 
         test('should error out when pagination throws errors', async () => {
-            const store = configureStore();
+            const {store} = configureStore();
 
             const p1Page = CHANNELS_AND_CHANNEL_MEMBERS_PER_PAGE;
             const p2Page = CHANNELS_AND_CHANNEL_MEMBERS_PER_PAGE; // so that page 3 will throw an error
