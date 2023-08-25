@@ -17,6 +17,8 @@ import {EmojiIndicesByAlias} from 'utils/emoji';
 
 export function loadRecentlyUsedCustomEmojis() {
     return async (dispatch, getState) => {
+        // HARRISON TODO hook this up to new batched actions and/or remove it
+        return {data: false};
         const state = getState();
         const config = getConfig(state);
 
@@ -71,7 +73,7 @@ export function addRecentEmojis(aliases) {
         const state = getState();
         const currentUserId = getCurrentUserId(state);
         const recentEmojis = getRecentEmojisData(state);
-        const emojiMap = getEmojiMap(state);
+        const emojiMap = getEmojiMap(state); // this one is probably fine
 
         let updatedRecentEmojis = [...recentEmojis];
         for (const alias of aliases) {
@@ -143,6 +145,8 @@ export function loadCustomEmojisForCustomStatusesByUserIds(userIds) {
 
 export function loadCustomEmojisIfNeeded(emojis) {
     return (dispatch, getState) => {
+        return {data: false};
+
         if (!emojis || emojis.length === 0) {
             return {data: false};
         }
@@ -155,7 +159,7 @@ export function loadCustomEmojisIfNeeded(emojis) {
 
         const systemEmojis = EmojiIndicesByAlias;
         const customEmojisByName = getCustomEmojisByName(state);
-        const nonExistentCustomEmoji = state.entities.emojis.nonExistentEmoji;
+        const nonExistentCustomEmoji = state.entities.emojis.nonExistentEmoji; // TODO remove this action
         const emojisToLoad = [];
 
         emojis.forEach((emoji) => {

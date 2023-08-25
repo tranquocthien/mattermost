@@ -1,7 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {connect} from 'react-redux';
+import React from 'react';
+import {connect, useSelector} from 'react-redux';
 import {bindActionCreators, Dispatch} from 'redux';
 
 import {getUser, getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
@@ -10,22 +11,18 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {deleteCustomEmoji} from 'mattermost-redux/actions/emojis';
 
 import {GenericAction} from 'mattermost-redux/types/actions';
+import {CustomEmoji} from '@mattermost/types/emojis';
+
+import {useEmojiByName} from 'data-layer/hooks/emojis';
 
 import {getDisplayNameByUser} from 'utils/utils';
 
-import {GlobalState} from '../../../types/store';
+import {GlobalState} from 'types/store';
 
-import EmojiListItem, {Props} from './emoji_list_item';
+import EmojiListItem from './emoji_list_item';
 
-function mapStateToProps(state: GlobalState, ownProps: Props) {
-    const emoji = state.entities.emojis.customEmoji[ownProps.emojiId!];
-    const creator = getUser(state, emoji.creator_id);
-
+function mapStateToProps(state: GlobalState) {
     return {
-        emoji,
-        creatorDisplayName: getDisplayNameByUser(state, creator),
-        creatorUsername: creator ? creator.username : '',
-        currentUserId: getCurrentUserId(state),
         currentTeam: getCurrentTeam(state),
     };
 }
@@ -38,4 +35,20 @@ function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EmojiListItem);
+export default connect(mapStateToProps, mapDispatchToProps)((props: any) => {
+    const emoji = useEmojiByName(props.emojiName);
+    const creator = useSelector((state: GlobalState) => {
+        if (!emoji || 'creator_id' in emoji) {
+            return undefined;
+        }
+
+        return getUser(state, (emoji as unknown as CustomEmoji).creator_id);
+    });
+
+    return React.createElement(EmojiListItem, {
+        ...props,
+        creatorDisplayName: useSelector((state: GlobalState) => getDisplayNameByUser(state, creator)),
+        creatorUsername: creator ? creator.username : '',
+        currentUserId: useSelector(getCurrentUserId),
+    });
+});

@@ -1,35 +1,41 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
-interface PostEmojiProps {
+import {getEmojiImageUrl} from 'mattermost-redux/utils/emoji_utils';
+
+import {useEmojiByName} from 'data-layer/hooks/emojis';
+
+interface Props {
     name: string;
-    imageUrl: string;
-}
-declare module 'react' {
-    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-        alt?: string;
-    }
 }
 
-export default class PostEmoji extends React.PureComponent<PostEmojiProps> {
-    public render() {
-        const emojiText = ':' + this.props.name + ':';
+export default function PostEmoji(props: Props) {
+    const emoji = useEmojiByName(props.name);
+    const emojiText = ':' + props.name + ':';
 
-        if (!this.props.imageUrl) {
-            return emojiText;
+    const style = useMemo(() => {
+        if (!emoji) {
+            return {};
         }
 
-        return (
-            <span
-                alt={emojiText}
-                className='emoticon'
-                title={emojiText}
-                style={{backgroundImage: 'url(' + this.props.imageUrl + ')'}}
-            >
-                {emojiText}
-            </span>
-        );
+        return {
+            backgroundImage: 'url(' + getEmojiImageUrl(emoji) + ')',
+        };
+    }, [emoji]);
+
+    if (!emoji) {
+        return <>{emojiText}</>;
     }
+
+    return (
+        <span
+            className='emoticon'
+            title={emojiText}
+            style={style}
+        >
+            {emojiText}
+        </span>
+    );
 }

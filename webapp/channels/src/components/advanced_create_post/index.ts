@@ -131,7 +131,7 @@ function makeMapStateToProps() {
             userIsOutOfOffice,
             rhsExpanded: getIsRhsExpanded(state),
             rhsOpen: getIsRhsOpen(state),
-            emojiMap: getEmojiMap(state),
+            emojiMap: getEmojiMap(state), // HARRISON this one is probably fine and will be changed by Daniel
             badConnection,
             isTimezoneEnabled,
             shortcutReactToLastPostEmittedFrom,

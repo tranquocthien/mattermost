@@ -21,7 +21,7 @@ type Actions = {
 
 function mapStateToProps(state: GlobalState) {
     return {
-        emojiMap: getEmojiMap(state),
+        emojiMap: getEmojiMap(state), // HARRISON TODO this one might be fine?
     };
 }
 

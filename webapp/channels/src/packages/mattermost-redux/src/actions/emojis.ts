@@ -34,6 +34,8 @@ export function createCustomEmoji(emoji: any, image: any): ActionFunc {
 }
 
 export function getCustomEmoji(emojiId: string): ActionFunc {
+    console.log('HARRISON getCustomEmoji', emojiId);
+
     return bindClientFunc({
         clientFunc: Client4.getCustomEmoji,
         onSuccess: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
@@ -45,6 +47,8 @@ export function getCustomEmoji(emojiId: string): ActionFunc {
 
 export function getCustomEmojiByName(name: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        console.log('HARRISON getCustomEmojiByName', name);
+
         let data;
 
         try {
@@ -72,12 +76,13 @@ export function getCustomEmojiByName(name: string): ActionFunc {
 
 export function getCustomEmojisByName(names: string[]): ActionFunc {
     return async (dispatch: DispatchFunc) => {
+        console.log('HARRISON getCustomEmojisByName', names);
         if (!names || names.length === 0) {
             return {data: true};
         }
 
         const promises: Array<Promise<ActionResult|ActionResult[]>> = [];
-        names.forEach((name) => promises.push(dispatch(getCustomEmojiByName(name))));
+        names.forEach((name) => promises.push(dispatch(getCustomEmojiByName(name)))); // TODO batch me
 
         await Promise.all(promises);
         return {data: true};
@@ -86,6 +91,8 @@ export function getCustomEmojisByName(names: string[]): ActionFunc {
 
 export function getCustomEmojisInText(text: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        // HARRISON TODO remove this function
+        return {data: false};
         if (!text) {
             return {data: true};
         }
@@ -107,6 +114,7 @@ export function getCustomEmojis(
     loadUsers = false,
 ): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        return {data: false};
         let data;
         try {
             data = await Client4.getCustomEmojis(page, perPage, sort);

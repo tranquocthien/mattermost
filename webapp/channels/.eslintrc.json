@@ -23,6 +23,8 @@
     }
   },
   "rules": {
+    "no-console": 1,
+    "no-unreachable": 0,
     "header/header": [
       2,
       "line",

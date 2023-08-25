@@ -6,7 +6,6 @@ import {batchActions} from 'redux-batched-actions';
 
 import {UserProfile} from '@mattermost/types/users';
 import {Group} from '@mattermost/types/groups';
-import {Reaction} from '@mattermost/types/reactions';
 import {Post, PostList, PostAcknowledgement} from '@mattermost/types/posts';
 import {GlobalState} from '@mattermost/types/store';
 import {Channel, ChannelUnread} from '@mattermost/types/channels';
@@ -37,7 +36,7 @@ import {
 } from 'mattermost-redux/actions/preferences';
 import {bindClientFunc, forceLogoutIfNecessary} from 'mattermost-redux/actions/helpers';
 import {logError} from './errors';
-import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from 'mattermost-redux/actions/emojis';
+import {systemEmojis, getCustomEmojiByName} from 'mattermost-redux/actions/emojis';
 import {selectChannel} from 'mattermost-redux/actions/channels';
 import {decrementThreadCounts} from 'mattermost-redux/actions/threads';
 
@@ -641,6 +640,9 @@ export function removeReaction(postId: string, emojiName: string) {
 
 export function getCustomEmojiForReaction(name: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        // HARRISON TODO this action can probably be removed
+        return {data: false};
+
         const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
         const customEmojisByName = selectCustomEmojisByName(getState());
 
@@ -671,34 +673,34 @@ export function getReactionsForPost(postId: string) {
             return {error};
         }
 
-        if (reactions && reactions.length > 0) {
-            const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
-            const customEmojisByName = selectCustomEmojisByName(getState());
-            const emojisToLoad = new Set<string>();
+        // if (reactions && reactions.length > 0) {
+        //     const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji; // TODO this can probably be removed
+        //     const customEmojisByName = selectCustomEmojisByName(getState());
+        //     const emojisToLoad = new Set<string>();
 
-            reactions.forEach((r: Reaction) => {
-                const name = r.emoji_name;
+        //     reactions.forEach((r: Reaction) => {
+        //         const name = r.emoji_name;
 
-                if (systemEmojis.has(name)) {
-                    // It's a system emoji, go the next match
-                    return;
-                }
+        //         if (systemEmojis.has(name)) {
+        //             // It's a system emoji, go the next match
+        //             return;
+        //         }
 
-                if (nonExistentEmoji.has(name)) {
-                    // We've previously confirmed this is not a custom emoji
-                    return;
-                }
+        //         if (nonExistentEmoji.has(name)) {
+        //             // We've previously confirmed this is not a custom emoji
+        //             return;
+        //         }
 
-                if (customEmojisByName.has(name)) {
-                    // We have the emoji, go to the next match
-                    return;
-                }
+        //         if (customEmojisByName.has(name)) {
+        //             // We have the emoji, go to the next match
+        //             return;
+        //         }
 
-                emojisToLoad.add(name);
-            });
+        //         emojisToLoad.add(name);
+        //     });
 
-            dispatch(getCustomEmojisByName(Array.from(emojisToLoad)));
-        }
+        //     dispatch(getCustomEmojisByName(Array.from(emojisToLoad)));
+        // }
 
         dispatch(batchActions([
             {
