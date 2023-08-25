@@ -2,7 +2,8 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import {mount} from 'enzyme';
+
+import {renderWithFullContext} from 'tests/react_testing_utils';
 
 import EmojiMap from 'utils/emoji_map';
 
@@ -17,7 +18,7 @@ describe('components/DialogIntroductionText', () => {
             value: '**bold** *italic* [link](https://mattermost.com/) <br/> [link target blank](!https://mattermost.com/)',
             emojiMap,
         };
-        const wrapper = mount(<DialogIntroductionText {...descriptor}/>);
+        const wrapper = renderWithFullContext(<DialogIntroductionText {...descriptor}/>);
         expect(wrapper).toMatchSnapshot();
     });
 
@@ -27,7 +28,7 @@ describe('components/DialogIntroductionText', () => {
             value: '',
             emojiMap,
         };
-        const wrapper = mount(<DialogIntroductionText {...descriptor}/>);
+        const wrapper = renderWithFullContext(<DialogIntroductionText {...descriptor}/>);
         expect(wrapper).toMatchSnapshot();
     });
 });

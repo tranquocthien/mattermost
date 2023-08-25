@@ -6,8 +6,6 @@ import {shallow} from 'enzyme';
 
 import {emitUserLoggedOutEvent} from 'actions/global_actions';
 
-import EmojiMap from 'utils/emoji_map';
-
 import TermsOfService, {TermsOfServiceProps} from './terms_of_service';
 
 jest.mock('actions/global_actions', () => ({
@@ -26,7 +24,6 @@ describe('components/terms_of_service/TermsOfService', () => {
         },
         location: {search: ''},
         termsEnabled: true,
-        emojiMap: {} as EmojiMap,
         onboardingFlowEnabled: false,
     };
 

@@ -33,7 +33,6 @@ export default class InteractiveDialog extends React.PureComponent {
         actions: PropTypes.shape({
             submitInteractiveDialog: PropTypes.func.isRequired,
         }).isRequired,
-        emojiMap: PropTypes.object.isRequired,
     };
 
     constructor(props) {
@@ -220,11 +219,7 @@ export default class InteractiveDialog extends React.PureComponent {
                     {(elements || introductionText) && (
                         <Modal.Body>
                             {introductionText && (
-                                <DialogIntroductionText
-                                    id='interactiveDialogModalIntroductionText'
-                                    value={introductionText}
-                                    emojiMap={this.props.emojiMap}
-                                />
+                                <DialogIntroductionText value={introductionText}/>
                             )}
                             {elements &&
                             elements.map((e, index) => {

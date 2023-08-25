@@ -5,21 +5,18 @@ import React from 'react';
 import {Button, ButtonGroup} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import {memoizeResult} from 'mattermost-redux/utils/helpers';
 import {TermsOfService as ReduxTermsOfService} from '@mattermost/types/terms_of_service';
 
 import * as GlobalActions from 'actions/global_actions';
 import AnnouncementBar from 'components/announcement_bar';
 import LoadingScreen from 'components/loading_screen';
+import Markdown from 'components/markdown';
 import LoadingSpinner from 'components/widgets/loading/loading_spinner';
 import LogoutIcon from 'components/widgets/icons/fa_logout_icon';
 import WarningIcon from 'components/widgets/icons/fa_warning_icon';
 
 import {getHistory} from 'utils/browser_history';
-import messageHtmlToComponent from 'utils/message_html_to_component';
-import {formatText} from 'utils/text_formatting';
 import {Constants} from 'utils/constants';
-import EmojiMap from 'utils/emoji_map';
 
 export interface UpdateMyTermsOfServiceStatusResponse {
     terms_of_service_create_at: number;
@@ -37,7 +34,6 @@ export interface TermsOfServiceProps {
             accepted: boolean
         ) => {data: UpdateMyTermsOfServiceStatusResponse};
     };
-    emojiMap: EmojiMap;
     onboardingFlowEnabled: boolean;
 }
 
@@ -50,9 +46,11 @@ interface TermsOfServiceState {
     serverError: React.ReactNode;
 }
 
-export default class TermsOfService extends React.PureComponent<TermsOfServiceProps, TermsOfServiceState> {
-    formattedText: (text: string) => string;
+const markdownOptions = {
+    atMentions: false,
+};
 
+export default class TermsOfService extends React.PureComponent<TermsOfServiceProps, TermsOfServiceState> {
     constructor(props: TermsOfServiceProps) {
         super(props);
 
@@ -64,8 +62,6 @@ export default class TermsOfService extends React.PureComponent<TermsOfServicePr
             loadingDisagree: false,
             serverError: null,
         };
-
-        this.formattedText = memoizeResult((text: string) => formatText(text, {}, props.emojiMap));
     }
 
     componentDidMount(): void {
@@ -188,7 +184,10 @@ export default class TermsOfService extends React.PureComponent<TermsOfServicePr
                                 className='medium-center'
                                 data-testid='termsOfService'
                             >
-                                {messageHtmlToComponent(this.formattedText(this.state.customTermsOfServiceText), {mentions: false})}
+                                <Markdown
+                                    message={this.state.customTermsOfServiceText}
+                                    options={markdownOptions}
+                                />
                             </div>
                         </div>
                         <div className='terms-of-service__footer medium-center'>

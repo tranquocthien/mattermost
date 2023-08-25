@@ -12,8 +12,6 @@ import {GlobalState} from '@mattermost/types/store';
 import {ActionFunc, GenericAction} from 'mattermost-redux/types/actions';
 import {TermsOfService as ReduxTermsOfService} from '@mattermost/types/terms_of_service';
 
-import {getEmojiMap} from 'selectors/emojis';
-
 import TermsOfService, {UpdateMyTermsOfServiceStatusResponse} from './terms_of_service';
 
 type Actions = {
@@ -30,7 +28,6 @@ function mapStateToProps(state: GlobalState) {
     return {
         onboardingFlowEnabled,
         termsEnabled: config.EnableCustomTermsOfService === 'true',
-        emojiMap: getEmojiMap(state), // HARRISON TODO figure out how to have markdown load emojis
     };
 }
 

@@ -113,8 +113,6 @@ import {loadPlugin, loadPluginsIfNecessary, removePlugin} from 'plugins';
 import {ActionTypes, Constants, AnnouncementBarMessages, SocketEvents, UserStatuses, ModalIdentifiers, WarnMetricTypes} from 'utils/constants';
 import {getSiteURL} from 'utils/url';
 import {isGuest} from 'mattermost-redux/utils/user_utils';
-import RemovedFromChannelModal from 'components/removed_from_channel_modal';
-import InteractiveDialog from 'components/interactive_dialog';
 import {
     getTeamsUsage,
 } from 'actions/cloud';
@@ -1029,6 +1027,10 @@ export function handleUserRemovedEvent(msg) {
                     dispatch(loadUser(msg.data.remover_id));
                 }
 
+                // Lazily require this to avoid import loops caused by actions importing components
+                // eslint-disable-next-line global-require
+                const RemovedFromChannelModal = require('components/removed_from_channel_modal').default;
+
                 dispatch(openModal({
                     modalId: ModalIdentifiers.REMOVED_FROM_CHANNEL,
                     dialogType: RemovedFromChannelModal,
@@ -1343,6 +1345,10 @@ function handleOpenDialogEvent(msg) {
     if (dialog.trigger_id !== currentTriggerId) {
         return;
     }
+
+    // Lazily require this to avoid import loops caused by actions importing components
+    // eslint-disable-next-line global-require
+    const InteractiveDialog = require('components/interactive_dialog').default;
 
     store.dispatch(openModal({modalId: ModalIdentifiers.INTERACTIVE_DIALOG, dialogType: InteractiveDialog}));
 }
