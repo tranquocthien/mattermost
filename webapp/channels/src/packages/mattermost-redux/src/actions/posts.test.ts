@@ -1,15 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import fs from 'fs';
-
 import nock from 'nock';
 
 import * as Actions from 'mattermost-redux/actions/posts';
 import {getChannelStats} from 'mattermost-redux/actions/channels';
 import {loadMeREST} from 'mattermost-redux/actions/users';
-import {createCustomEmoji} from 'mattermost-redux/actions/emojis';
 import {Client4} from 'mattermost-redux/client';
+import {GetStateFunc} from 'mattermost-redux/types/actions';
 import {Preferences, Posts, RequestStatus} from '../constants';
 import {PostTypes, UserTypes} from 'mattermost-redux/action_types';
 import TestHelper from '../../test/test_helper';
@@ -17,7 +15,6 @@ import configureStore from '../../test/test_store';
 import {getPreferenceKey} from 'mattermost-redux/utils/preference_utils';
 import {GlobalState} from '@mattermost/types/store';
 import {Post, PostList} from '@mattermost/types/posts';
-import {ActionResult, GetStateFunc} from 'mattermost-redux/types/actions';
 
 const OK_RESPONSE = {status: 'OK'};
 
@@ -1313,41 +1310,6 @@ describe('Actions.Posts', () => {
 
         expect(reactions).toBeTruthy();
         expect(reactions[TestHelper.basicUser!.id + '-' + emojiName]).toBeTruthy();
-    });
-
-    it('getCustomEmojiForReaction', async () => {
-        const testImageData = fs.createReadStream('src/packages/mattermost-redux/test/assets/images/test.png');
-        const {dispatch, getState} = store;
-
-        nock(Client4.getBaseRoute()).
-            post('/emoji').
-            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser!.id, name: TestHelper.generateId()});
-
-        const {data: created} = await createCustomEmoji(
-            {
-                name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser!.id,
-            },
-            testImageData,
-        )(store.dispatch, store.getState) as ActionResult;
-
-        nock(Client4.getEmojisRoute()).
-            get(`/name/${created.name}`).
-            reply(200, created);
-
-        const missingEmojiName = ':notrealemoji:';
-
-        nock(Client4.getEmojisRoute()).
-            get(`/name/${missingEmojiName}`).
-            reply(404, {message: 'Not found', status_code: 404});
-
-        await Actions.getCustomEmojiForReaction(missingEmojiName)(dispatch, getState);
-
-        const state = getState();
-        const emojis = state.entities.emojis.customEmoji;
-        expect(emojis).toBeTruthy();
-        expect(emojis[created.id]).toBeTruthy();
-        expect(state.entities.emojis.nonExistentEmoji.has(missingEmojiName)).toBeTruthy();
     });
 
     it('doPostAction', async () => {

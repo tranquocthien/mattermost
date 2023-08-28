@@ -10,6 +10,11 @@ import {IDMappedObjects} from '@mattermost/types/utilities';
 
 import {createIdsSelector} from 'mattermost-redux/utils/helpers';
 
+export let systemEmojis: Set<string> = new Set();
+export function setSystemEmojis(emojis: Set<string>) {
+    systemEmojis = emojis;
+}
+
 export const getCustomEmojisEnabled = (state: GlobalState): boolean => {
     return getConfig(state)?.EnableCustomEmoji === 'true';
 };
@@ -52,6 +57,12 @@ export const getCustomEmojisByName: (state: GlobalState) => Map<string, CustomEm
         return map;
     },
 );
+
+export function getShouldFetchEmojiByName(state: GlobalState, name: string) {
+    return !systemEmojis.has(name) &&
+        !state.entities.emojis.nonExistentEmoji.has(name) &&
+        !getCustomEmojisByName(state).has(name);
+}
 
 export const getCustomEmojiIdsSortedByName: (state: GlobalState) => string[] = createIdsSelector(
     'getCustomEmojiIdsSortedByName',

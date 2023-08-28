@@ -8,12 +8,12 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import moment, {Moment} from 'moment-timezone';
 import {useRouteMatch} from 'react-router-dom';
 
+import {fetchEmojisByNameIfNeeded} from 'mattermost-redux/actions/emojis';
 import {setCustomStatus, unsetCustomStatus, removeRecentCustomStatus} from 'mattermost-redux/actions/users';
 import {setCustomStatusInitialisationState} from 'mattermost-redux/actions/preferences';
 import {Preferences} from 'mattermost-redux/constants';
 import {getCurrentTimezone} from 'mattermost-redux/selectors/entities/timezone';
 
-import {loadCustomEmojisIfNeeded} from 'actions/emoji_actions';
 import {closeModal} from 'actions/views/modals';
 import {GenericModal} from '@mattermost/components';
 import EmojiIcon from 'components/widgets/icons/emoji_icon';
@@ -148,9 +148,11 @@ const CustomStatusModal: React.FC<Props> = (props: Props) => {
     };
 
     const loadCustomEmojisForRecentStatuses = () => {
+        // HARRISON TODO is this needed?
+
         const emojisToLoad = new Set<string>();
         recentCustomStatuses.forEach((customStatus: UserCustomStatus) => emojisToLoad.add(customStatus.emoji));
-        dispatch(loadCustomEmojisIfNeeded(Array.from(emojisToLoad)));
+        dispatch(fetchEmojisByNameIfNeeded(Array.from(emojisToLoad)));
     };
 
     const handleStatusExpired = () => {

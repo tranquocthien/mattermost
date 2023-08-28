@@ -18,7 +18,6 @@ import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'mattermost-r
 import {ActionResult, DispatchFunc, GetStateFunc} from 'mattermost-redux/types/actions';
 
 import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'mattermost-redux/selectors/entities/channels';
-import {getCustomEmojisByName as selectCustomEmojisByName} from 'mattermost-redux/selectors/entities/emojis';
 import * as PostSelectors from 'mattermost-redux/selectors/entities/posts';
 import {getCurrentUserId, getUsersByUsername} from 'mattermost-redux/selectors/entities/users';
 import {getAllGroupsByName} from 'mattermost-redux/selectors/entities/groups';
@@ -36,7 +35,6 @@ import {
 } from 'mattermost-redux/actions/preferences';
 import {bindClientFunc, forceLogoutIfNecessary} from 'mattermost-redux/actions/helpers';
 import {logError} from './errors';
-import {systemEmojis, getCustomEmojiByName} from 'mattermost-redux/actions/emojis';
 import {selectChannel} from 'mattermost-redux/actions/channels';
 import {decrementThreadCounts} from 'mattermost-redux/actions/threads';
 
@@ -638,30 +636,6 @@ export function removeReaction(postId: string, emojiName: string) {
     };
 }
 
-export function getCustomEmojiForReaction(name: string) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        // HARRISON TODO this action can probably be removed
-        return {data: false};
-
-        const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
-        const customEmojisByName = selectCustomEmojisByName(getState());
-
-        if (systemEmojis.has(name)) {
-            return {data: true};
-        }
-
-        if (nonExistentEmoji.has(name)) {
-            return {data: true};
-        }
-
-        if (customEmojisByName.has(name)) {
-            return {data: true};
-        }
-
-        return dispatch(getCustomEmojiByName(name));
-    };
-}
-
 export function getReactionsForPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let reactions;
@@ -673,42 +647,11 @@ export function getReactionsForPost(postId: string) {
             return {error};
         }
 
-        // if (reactions && reactions.length > 0) {
-        //     const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji; // TODO this can probably be removed
-        //     const customEmojisByName = selectCustomEmojisByName(getState());
-        //     const emojisToLoad = new Set<string>();
-
-        //     reactions.forEach((r: Reaction) => {
-        //         const name = r.emoji_name;
-
-        //         if (systemEmojis.has(name)) {
-        //             // It's a system emoji, go the next match
-        //             return;
-        //         }
-
-        //         if (nonExistentEmoji.has(name)) {
-        //             // We've previously confirmed this is not a custom emoji
-        //             return;
-        //         }
-
-        //         if (customEmojisByName.has(name)) {
-        //             // We have the emoji, go to the next match
-        //             return;
-        //         }
-
-        //         emojisToLoad.add(name);
-        //     });
-
-        //     dispatch(getCustomEmojisByName(Array.from(emojisToLoad)));
-        // }
-
-        dispatch(batchActions([
-            {
-                type: PostTypes.RECEIVED_REACTIONS,
-                data: reactions,
-                postId,
-            },
-        ]));
+        dispatch({
+            type: PostTypes.RECEIVED_REACTIONS,
+            data: reactions,
+            postId,
+        });
 
         return reactions;
     };

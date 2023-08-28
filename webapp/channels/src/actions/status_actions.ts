@@ -11,7 +11,6 @@ import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 import {ActionFunc, DispatchFunc, GetStateFunc} from 'mattermost-redux/types/actions';
 import {GlobalState} from 'types/store';
 
-import {loadCustomEmojisForCustomStatusesByUserIds} from 'actions/emoji_actions';
 import {Constants} from 'utils/constants';
 
 export function loadStatusesForChannelAndSidebar(): ActionFunc {
@@ -90,7 +89,6 @@ export function loadStatusesByIds(userIds: string[]) {
         }
 
         dispatch(getStatusesByIds(userIds));
-        dispatch(loadCustomEmojisForCustomStatusesByUserIds(userIds));
         return {data: true};
     };
 }
@@ -109,7 +107,6 @@ export function loadProfilesMissingStatus(users: UserProfile[]) {
         }
 
         dispatch(getStatusesByIds(missingStatusByIds));
-        dispatch(loadCustomEmojisForCustomStatusesByUserIds(missingStatusByIds));
         return {data: true};
     };
 }

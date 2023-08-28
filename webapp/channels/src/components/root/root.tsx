@@ -10,16 +10,15 @@ import classNames from 'classnames';
 import {Client4} from 'mattermost-redux/client';
 import {rudderAnalytics, RudderTelemetryHandler} from 'mattermost-redux/client/rudder';
 import {General} from 'mattermost-redux/constants';
+import {setSystemEmojis} from 'mattermost-redux/selectors/entities/emojis';
 import {Theme, getIsOnboardingFlowEnabled} from 'mattermost-redux/selectors/entities/preferences';
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getCurrentUser, isCurrentUserSystemAdmin, checkIsFirstAdmin} from 'mattermost-redux/selectors/entities/users';
 import {getActiveTeamsList} from 'mattermost-redux/selectors/entities/teams';
 import {setUrl} from 'mattermost-redux/actions/general';
-import {setSystemEmojis} from 'mattermost-redux/actions/emojis';
 
 import {ProductComponent, PluginComponent} from 'types/store/plugins';
 
-import {loadRecentlyUsedCustomEmojis} from 'actions/emoji_actions';
 import * as GlobalActions from 'actions/global_actions';
 import {measurePageLoadTelemetry, trackEvent, trackSelectorMetrics} from 'actions/telemetry_actions.jsx';
 
@@ -146,6 +145,7 @@ export type Actions = {
     loadConfigAndMe: () => Promise<{data: boolean}>;
     registerCustomPostRenderer: (type: string, component: any, id: string) => Promise<ActionResult>;
     initializeProducts: () => Promise<void[]>;
+    loadRecentlyUsedCustomEmojis: () => void;
 }
 
 type Props = {
@@ -308,7 +308,7 @@ export default class Root extends React.PureComponent<Props, State> {
         });
 
         this.props.actions.migrateRecentEmojis();
-        loadRecentlyUsedCustomEmojis()(store.dispatch, store.getState);
+        this.props.actions.loadRecentlyUsedCustomEmojis();
 
         const iosDownloadLink = getConfig(store.getState()).IosAppDownloadLink;
         const androidDownloadLink = getConfig(store.getState()).AndroidAppDownloadLink;

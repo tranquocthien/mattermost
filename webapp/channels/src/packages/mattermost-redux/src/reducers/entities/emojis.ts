@@ -38,18 +38,18 @@ export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: Ge
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
-        // HARRISON TODO re-add me?
+    // HARRISON TODO re-add me?
         // case PostTypes.RECEIVED_NEW_POST:
-        // case PostTypes.RECEIVED_POST: {
+    // case PostTypes.RECEIVED_POST: {
         //     const post: Post = action.data;
 
         //     return storeEmojisForPost(state, post);
-        // }
+    // }
         // case PostTypes.RECEIVED_POSTS: {
         //     const posts: Post[] = Object.values(action.data.posts);
 
         //     return posts.reduce(storeEmojisForPost, state);
-        // }
+    // }
 
     default:
         return state;
@@ -69,14 +69,14 @@ function storeEmoji(state: IDMappedObjects<CustomEmoji>, emoji: CustomEmoji) {
 }
 
 // function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): IDMappedObjects<CustomEmoji> {
-//     if (!post.metadata || !post.metadata.emojis) {
-//         return state;
-//     }
+    //     if (!post.metadata || !post.metadata.emojis) {
+        //         return state;
+    //     }
 
-//     return post.metadata.emojis.reduce(storeEmoji, state);
+    //     return post.metadata.emojis.reduce(storeEmoji, state);
 // }
 
-function nonExistentEmoji(state: Set<string> = new Set(), action: GenericAction): Set<string> { // HARRISON TODO remove me
+function nonExistentEmoji(state: Set<string> = new Set(), action: GenericAction): Set<string> { // HARRISON TODO remove me and store this in the saga?
     switch (action.type) {
     case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST: {
         if (!state.has(action.data)) {

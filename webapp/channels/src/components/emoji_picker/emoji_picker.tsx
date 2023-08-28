@@ -32,7 +32,7 @@ import EmojiPickerCurrentResults from 'components/emoji_picker/components/emoji_
 
 import type {PropsFromRedux} from './index';
 
-interface Props extends PropsFromRedux {
+export interface Props extends PropsFromRedux {
     filter: string;
     onEmojiClick: (emoji: Emoji) => void;
     handleFilterChange: (filter: string) => void;

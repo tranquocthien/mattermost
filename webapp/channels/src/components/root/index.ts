@@ -20,7 +20,7 @@ import {
     getRhsState,
 } from 'selectors/rhs';
 import {shouldShowAppBar} from 'selectors/plugins';
-import {migrateRecentEmojis} from 'actions/emoji_actions';
+import {loadRecentlyUsedCustomEmojis, migrateRecentEmojis} from 'actions/emoji_actions';
 import {emitBrowserWindowResized} from 'actions/views/browser';
 import {loadConfigAndMe, registerCustomPostRenderer} from 'actions/views/root';
 
@@ -64,6 +64,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
     return {
         actions: bindActionCreators<ActionCreatorsMapObject<Action>, Actions>({
             loadConfigAndMe,
+            loadRecentlyUsedCustomEmojis,
             emitBrowserWindowResized,
             getFirstAdminSetupComplete,
             getProfiles,

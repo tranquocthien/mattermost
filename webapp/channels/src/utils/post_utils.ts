@@ -696,9 +696,9 @@ export function makeGetUniqueReactionsToPost(): (state: GlobalState, postId: Pos
 
             Object.entries(reactions).forEach(([userIdEmojiKey, emojiReaction]) => {
                 // HARRISON TODO we need to either make this component load its own emojis or function with undefined emojis (probably the former) because it never renders the components that use these hooks
-                // if (emojiMap.get(emojiReaction.emoji_name)) {
+                if (emojiMap.get(emojiReaction.emoji_name)) {
                     reactionsForPost[userIdEmojiKey] = emojiReaction;
-                // }
+                }
             });
 
             return reactionsForPost;
