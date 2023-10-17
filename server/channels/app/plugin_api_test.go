@@ -5,6 +5,7 @@ package app
 
 import (
 	"bytes"
+	"embed"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -35,6 +36,9 @@ import (
 	"github.com/mattermost/mattermost/server/v8/channels/utils/fileutils"
 	"github.com/mattermost/mattermost/server/v8/einterfaces/mocks"
 )
+
+//go:embed plugin_api_tests
+var pluginAPITests embed.FS
 
 func getDefaultPluginSettingsSchema() string {
 	ret, _ := json.Marshal(model.PluginSettingsSchema{
@@ -752,9 +756,7 @@ func TestPluginAPILoadPluginConfiguration(t *testing.T) {
 		cfg.PluginSettings.Plugins["testloadpluginconfig"] = pluginJson
 	})
 
-	testFolder, found := fileutils.FindDir("channels/app/plugin_api_tests")
-	require.True(t, found, "Cannot find tests folder")
-	fullPath := path.Join(testFolder, "manual.test_load_configuration_plugin", "main.go")
+	fullPath := path.Join("plugin_api_tests", "manual.test_load_configuration_plugin", "main.go")
 
 	err = pluginAPIHookTest(t, th, fullPath, "testloadpluginconfig", `{"id": "testloadpluginconfig", "server": {"executable": "backend.exe"}, "settings_schema": {
 		"settings": [
@@ -787,9 +789,7 @@ func TestPluginAPILoadPluginConfigurationDefaults(t *testing.T) {
 		cfg.PluginSettings.Plugins["testloadpluginconfig"] = pluginJson
 	})
 
-	testFolder, found := fileutils.FindDir("channels/app/plugin_api_tests")
-	require.True(t, found, "Cannot find tests folder")
-	fullPath := path.Join(testFolder, "manual.test_load_configuration_defaults_plugin", "main.go")
+	fullPath := path.Join("plugin_api_tests", "manual.test_load_configuration_defaults_plugin", "main.go")
 
 	err = pluginAPIHookTest(t, th, fullPath, "testloadpluginconfig", `{
 		"settings": [
@@ -878,7 +878,7 @@ func TestPluginAPIInstallPlugin(t *testing.T) {
 	api := th.SetupPluginAPI()
 
 	path, _ := fileutils.FindDir("tests")
-	tarData, err := os.ReadFile(filepath.Join(path, "testplugin.tar.gz"))
+	tarData, err := pluginAPITests.ReadFile(filepath.Join(path, "testplugin.tar.gz"))
 	require.NoError(t, err)
 
 	_, appErr := api.InstallPlugin(bytes.NewReader(tarData), true)
@@ -1120,7 +1120,7 @@ func TestPluginAPIRemoveTeamIcon(t *testing.T) {
 }
 
 func pluginAPIHookTest(t *testing.T, th *TestHelper, fileName string, id string, settingsSchema string) error {
-	data, err := os.ReadFile(fileName)
+	data, err := pluginAPITests.ReadFile(fileName)
 	if err != nil {
 		return err
 	}
@@ -1153,17 +1153,14 @@ func pluginAPIHookTest(t *testing.T, th *TestHelper, fileName string, id string,
 
 func TestBasicAPIPlugins(t *testing.T) {
 	defaultSchema := getDefaultPluginSettingsSchema()
-	testFolder, found := fileutils.FindDir("channels/app/plugin_api_tests")
-	require.True(t, found, "Cannot read find app folder")
-	dirs, err := os.ReadDir(testFolder)
+	testFolder := "plugin_api_tests"
+	dirs, err := pluginAPITests.ReadDir(testFolder)
 	require.NoError(t, err, "Cannot read test folder %v", testFolder)
 	for _, dir := range dirs {
 		d := dir.Name()
 		if dir.IsDir() && !strings.HasPrefix(d, "manual.") {
 			t.Run(d, func(t *testing.T) {
 				mainPath := path.Join(testFolder, d, "main.go")
-				_, err := os.Stat(mainPath)
-				require.NoError(t, err, "Cannot find plugin main file at %v", mainPath)
 				th := Setup(t).InitBasic().DeleteBots()
 				defer th.TearDown()
 				setDefaultPluginConfig(th, dir.Name())
@@ -1739,11 +1736,9 @@ func TestPluginHTTPConnHijack(t *testing.T) {
 	th := Setup(t)
 	defer th.TearDown()
 
-	testFolder, found := fileutils.FindDir("channels/app/plugin_api_tests")
-	require.True(t, found, "Cannot find tests folder")
-	fullPath := path.Join(testFolder, "manual.test_http_hijack_plugin", "main.go")
+	fullPath := path.Join("plugin_api_tests", "manual.test_http_hijack_plugin", "main.go")
 
-	pluginCode, err := os.ReadFile(fullPath)
+	pluginCode, err := pluginAPITests.ReadFile(fullPath)
 	require.NoError(t, err)
 	require.NotEmpty(t, pluginCode)
 
@@ -1774,11 +1769,9 @@ func TestPluginHTTPUpgradeWebSocket(t *testing.T) {
 	th := Setup(t)
 	defer th.TearDown()
 
-	testFolder, found := fileutils.FindDir("channels/app/plugin_api_tests")
-	require.True(t, found, "Cannot find tests folder")
-	fullPath := path.Join(testFolder, "manual.test_http_upgrade_websocket_plugin", "main.go")
+	fullPath := path.Join("plugin_api_tests", "manual.test_http_upgrade_websocket_plugin", "main.go")
 
-	pluginCode, err := os.ReadFile(fullPath)
+	pluginCode, err := pluginAPITests.ReadFile(fullPath)
 	require.NoError(t, err)
 	require.NotEmpty(t, pluginCode)
 
