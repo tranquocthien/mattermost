@@ -878,7 +878,7 @@ func TestPluginAPIInstallPlugin(t *testing.T) {
 	api := th.SetupPluginAPI()
 
 	path, _ := fileutils.FindDir("tests")
-	tarData, err := pluginAPITests.ReadFile(filepath.Join(path, "testplugin.tar.gz"))
+	tarData, err := os.ReadFile(filepath.Join(path, "testplugin.tar.gz"))
 	require.NoError(t, err)
 
 	_, appErr := api.InstallPlugin(bytes.NewReader(tarData), true)
