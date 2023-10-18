@@ -5,8 +5,24 @@ package fileutils
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 )
+
+var mattermostRoot string
+
+func init() {
+	// Try to find the Mattermost root by looking for a concrete package below
+	// github.com/mattermost/mattermost/server/v8 and traversing back to the root path on disk.
+	cmd := exec.Command("go", "list", "-f={{.Dir}}", "github.com/mattermost/mattermost/server/v8/channels/api4")
+	p, err := cmd.Output()
+	if err != nil {
+		// This was always a best effort. Don't bother trying again if we fail.
+		return
+	}
+
+	mattermostRoot = filepath.Join(string(p), "../../")
+}
 
 func CommonBaseSearchPaths() []string {
 	paths := []string{
@@ -15,6 +31,7 @@ func CommonBaseSearchPaths() []string {
 		"../..",
 		"../../..",
 		"../../../..",
+		mattermostRoot,
 	}
 
 	return paths
