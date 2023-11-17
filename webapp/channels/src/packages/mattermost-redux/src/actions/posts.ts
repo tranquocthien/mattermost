@@ -1057,7 +1057,7 @@ export async function getMentionsAndStatusesForPosts(postsArrayOrMap: Post[]|Pos
 
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
-    const enableUserStatuses = getIsUserStatusesConfigEnabled(state);
+    const enabledUserStatuses = getIsUserStatusesConfigEnabled(state);
 
     // Statuses and profiles of the users who made the posts
     const userIdsToLoad = new Set<string>();
@@ -1107,7 +1107,7 @@ export async function getMentionsAndStatusesForPosts(postsArrayOrMap: Post[]|Pos
         promises.push(getProfilesByIds(Array.from(userIdsToLoad))(dispatch, getState));
     }
 
-    if (statusesToLoad.size > 0 && enableUserStatuses) {
+    if (statusesToLoad.size > 0 && enabledUserStatuses) {
         promises.push(getStatusesByIds(Array.from(statusesToLoad))(dispatch, getState));
     }
 

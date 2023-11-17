@@ -152,7 +152,7 @@ export function getMissingProfilesByIds(userIds: string[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const {profiles} = state.entities.users;
-        const enableUserStatuses = getIsUserStatusesConfigEnabled(state);
+        const enabledUserStatuses = getIsUserStatusesConfigEnabled(state);
         const missingIds: string[] = [];
         userIds.forEach((id) => {
             if (!profiles[id]) {
@@ -160,8 +160,10 @@ export function getMissingProfilesByIds(userIds: string[]): ActionFunc {
             }
         });
 
-        if (missingIds.length > 0 && enableUserStatuses) {
-            getStatusesByIds(missingIds)(dispatch, getState);
+        if (missingIds.length > 0) {
+            if (enabledUserStatuses) {
+                getStatusesByIds(missingIds)(dispatch, getState);
+            }
             return getProfilesByIds(missingIds)(dispatch, getState);
         }
 
@@ -873,7 +875,7 @@ let statusIntervalId: NodeJS.Timeout|null;
 export function startPeriodicStatusUpdates(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
-        const enableUserStatuses = getIsUserStatusesConfigEnabled(state);
+        const enabledUserStatuses = getIsUserStatusesConfigEnabled(state);
         if (statusIntervalId) {
             clearInterval(statusIntervalId);
         }
@@ -887,7 +889,7 @@ export function startPeriodicStatusUpdates(): ActionFunc {
                 }
 
                 const userIds = Object.keys(statuses);
-                if (!userIds.length || !enableUserStatuses) {
+                if (!userIds.length || !enabledUserStatuses) {
                     return;
                 }
 
