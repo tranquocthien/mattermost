@@ -5,10 +5,13 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/v8/cmd/mmctl/client"
 	"github.com/mattermost/mattermost/server/v8/cmd/mmctl/printer"
 )
@@ -40,11 +43,83 @@ var LdapIDMigrate = &cobra.Command{
 	RunE:    withClient(ldapIDMigrateCmdF),
 }
 
+var LdapJobCmd = &cobra.Command{
+	Use:   "job",
+	Short: "List and show LDAP sync jobs",
+}
+
+var LdapJobListCmd = &cobra.Command{
+	Use:     "list",
+	Example: "  ldap job list",
+	Short:   "List LDAP sync jobs",
+	Aliases: []string{"ls"},
+	Args:    cobra.NoArgs,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
+	RunE: withClient(ldapJobListCmdF),
+}
+
+var LdapJobShowCmd = &cobra.Command{
+	Use:     "show [ldapJobID]",
+	Example: " import ldap show f3d68qkkm7n8xgsfxwuo498rah",
+	Short:   "Show LDAP sync job",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if toComplete == "" {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), shellCompleteTimeout)
+		defer cancel()
+
+		c, _, _, err := getClient(ctx)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		var r []string
+		var page int
+		for {
+			jobs, _, err := c.GetJobsByType(ctx, model.JobTypeLdapSync, page, perPage)
+			if err != nil {
+				// Return what we got so far
+				return r, cobra.ShellCompDirectiveNoFileComp
+			}
+
+			for _, j := range jobs {
+				if strings.HasPrefix(j.Id, toComplete) {
+					r = append(r, j.Id)
+				}
+			}
+
+			if len(jobs) < perPage {
+				break
+			}
+
+			page++
+		}
+
+		return r, cobra.ShellCompDirectiveNoFileComp
+	},
+	RunE: withClient(ldapJobShowCmdF),
+}
+
 func init() {
 	LdapSyncCmd.Flags().Bool("include-removed-members", false, "Include members who left or were removed from a group-synced team/channel")
+
+	LdapJobListCmd.Flags().Int("page", 0, "Page number to fetch for the list of import jobs")
+	LdapJobListCmd.Flags().Int("per-page", 200, "Number of import jobs to be fetched")
+	LdapJobListCmd.Flags().Bool("all", false, "Fetch all import jobs. --page flag will be ignore if provided")
+
+	LdapJobCmd.AddCommand(
+		LdapJobListCmd,
+		LdapJobShowCmd,
+	)
+
 	LdapCmd.AddCommand(
 		LdapSyncCmd,
 		LdapIDMigrate,
+		LdapJobCmd,
 	)
 	RootCmd.AddCommand(LdapCmd)
 }
@@ -78,6 +153,21 @@ func ldapIDMigrateCmdF(c client.Client, cmd *cobra.Command, args []string) error
 	if resp.StatusCode == http.StatusOK {
 		printer.Print("AD/LDAP IdAttribute migration complete. You can now change your IdAttribute to: " + toAttribute)
 	}
+
+	return nil
+}
+
+func ldapJobListCmdF(c client.Client, command *cobra.Command, args []string) error {
+	return jobListCmdF(c, command, model.JobTypeLdapSync)
+}
+
+func ldapJobShowCmdF(c client.Client, command *cobra.Command, args []string) error {
+	job, _, err := c.GetJob(context.TODO(), args[0])
+	if err != nil {
+		return fmt.Errorf("failed to get LDAP sync job: %w", err)
+	}
+
+	printJob(job)
 
 	return nil
 }
