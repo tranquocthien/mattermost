@@ -61,47 +61,11 @@ var LdapJobListCmd = &cobra.Command{
 }
 
 var LdapJobShowCmd = &cobra.Command{
-	Use:     "show [ldapJobID]",
-	Example: " import ldap show f3d68qkkm7n8xgsfxwuo498rah",
-	Short:   "Show LDAP sync job",
-	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		if toComplete == "" {
-			return nil, cobra.ShellCompDirectiveNoFileComp
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), shellCompleteTimeout)
-		defer cancel()
-
-		c, _, _, err := getClient(ctx)
-		if err != nil {
-			return nil, cobra.ShellCompDirectiveError
-		}
-
-		var r []string
-		var page int
-		for {
-			jobs, _, err := c.GetJobsByType(ctx, model.JobTypeLdapSync, page, perPage)
-			if err != nil {
-				// Return what we got so far
-				return r, cobra.ShellCompDirectiveNoFileComp
-			}
-
-			for _, j := range jobs {
-				if strings.HasPrefix(j.Id, toComplete) {
-					r = append(r, j.Id)
-				}
-			}
-
-			if len(jobs) < perPage {
-				break
-			}
-
-			page++
-		}
-
-		return r, cobra.ShellCompDirectiveNoFileComp
-	},
-	RunE: withClient(ldapJobShowCmdF),
+	Use:               "show [ldapJobID]",
+	Example:           " import ldap show f3d68qkkm7n8xgsfxwuo498rah",
+	Short:             "Show LDAP sync job",
+	ValidArgsFunction: validateArgsWithClient(ldapJobShowCmdArgsF),
+	RunE:              withClient(ldapJobShowCmdF),
 }
 
 func init() {
@@ -170,4 +134,38 @@ func ldapJobShowCmdF(c client.Client, command *cobra.Command, args []string) err
 	printJob(job)
 
 	return nil
+}
+
+func ldapJobShowCmdArgsF(ctx context.Context, c client.Client, cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	if toComplete == "" {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	}
+
+	var r []string
+	var page int
+	for {
+		jobs, _, err := c.GetJobsByType(ctx, model.JobTypeLdapSync, page, perPage)
+		if err != nil {
+			// Return what we got so far
+			return r, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		for _, j := range jobs {
+			if strings.HasPrefix(j.Id, toComplete) {
+				r = append(r, j.Id)
+			}
+		}
+
+		if len(jobs) < perPage {
+			break
+		}
+
+		page++
+	}
+
+	if len(r) > shellCompletionMaxItems {
+		r = r[:shellCompletionMaxItems]
+	}
+
+	return r, cobra.ShellCompDirectiveNoFileComp
 }

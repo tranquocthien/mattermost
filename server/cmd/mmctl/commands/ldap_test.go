@@ -5,6 +5,7 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -209,5 +210,61 @@ func (s *MmctlUnitTestSuite) TestLdapJobShowCmdF() {
 		s.Len(printer.GetLines(), 1)
 		s.Empty(printer.GetErrorLines())
 		s.Equal(mockJob, printer.GetLines()[0].(*model.Job))
+	})
+
+	s.Run("shell completion", func() {
+		s.Run("no match for empty argument", func() {
+			r, dir := ldapJobShowCmdArgsF(context.Background(), s.client, nil, nil, "")
+			s.Equal(cobra.ShellCompDirectiveNoFileComp, dir)
+			s.Nil(r)
+		})
+
+		s.Run("one element matches", func() {
+			mockJobs := []*model.Job{
+				{
+					Id: "0_id",
+				},
+				{
+					Id: "1_id",
+				},
+				{
+					Id: "2_id",
+				},
+			}
+
+			s.client.
+				EXPECT().
+				GetJobsByType(context.Background(), model.JobTypeLdapSync, 0, perPage).
+				Return(mockJobs, &model.Response{}, nil).
+				Times(1)
+
+			r, dir := ldapJobShowCmdArgsF(context.Background(), s.client, nil, nil, "1")
+			s.Equal(cobra.ShellCompDirectiveNoFileComp, dir)
+			s.Equal([]string{"1_id"}, r)
+		})
+
+		s.Run("more elements then the limit match", func() {
+			var mockJobs []*model.Job
+			for i := 0; i < 100; i++ {
+				mockJobs = append(mockJobs, &model.Job{
+					Id: fmt.Sprintf("id_%d", i),
+				})
+			}
+
+			var expected []string
+			for i := 0; i < shellCompletionMaxItems; i++ {
+				expected = append(expected, fmt.Sprintf("id_%d", i))
+			}
+
+			s.client.
+				EXPECT().
+				GetJobsByType(context.Background(), model.JobTypeLdapSync, 0, perPage).
+				Return(mockJobs, &model.Response{}, nil).
+				Times(1)
+
+			r, dir := ldapJobShowCmdArgsF(context.Background(), s.client, nil, nil, "id_")
+			s.Equal(cobra.ShellCompDirectiveNoFileComp, dir)
+			s.Equal(expected, r)
+		})
 	})
 }

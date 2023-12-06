@@ -26,9 +26,10 @@ import (
 )
 
 const (
-	maxCompetionItems    = 100
-	perPage              = 200
-	shellCompleteTimeout = 10 * time.Second
+	perPage = 200
+
+	shellCompletionMaxItems = 50 // Maximum number of items that will be loaded and shown in shell completion
+	shellCompleteTimeout    = 10 * time.Second
 )
 
 var (
@@ -86,6 +87,20 @@ func getClient(ctx context.Context) (*model.Client4, string, bool, error) {
 	}
 
 	return c, serverVersion, false, nil
+}
+
+func validateArgsWithClient(fn func(ctx context.Context, c client.Client, cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective)) func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		ctx, cancel := context.WithTimeout(context.Background(), shellCompleteTimeout)
+		defer cancel()
+
+		c, _, _, err := getClient(ctx)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		return fn(ctx, c, cmd, args, toComplete)
+	}
 }
 
 func withClient(fn func(c client.Client, cmd *cobra.Command, args []string) error) func(cmd *cobra.Command, args []string) error {
