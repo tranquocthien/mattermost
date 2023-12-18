@@ -18,7 +18,7 @@ import {
     searchProfiles,
     getFilteredUsersStats,
 } from 'mattermost-redux/actions/users';
-import {getConfig} from 'mattermost-redux/selectors/entities/general';
+import {getConfig, getSiteName} from 'mattermost-redux/selectors/entities/general';
 import {getTeamsList} from 'mattermost-redux/selectors/entities/teams';
 import {getFilteredUsersStats as selectFilteredUserStats, getUsers} from 'mattermost-redux/selectors/entities/users';
 import type {Action, ActionFunc, GenericAction} from 'mattermost-redux/types/actions';
@@ -35,7 +35,7 @@ import SystemUsers from './system_users';
 function mapStateToProps(state: GlobalState) {
     const config = getConfig(state);
 
-    const siteName = config.SiteName;
+    const siteName = getSiteName(state);
     const mfaEnabled = config.EnableMultifactorAuthentication === 'true';
     const enableUserAccessTokens = config.EnableUserAccessTokens === 'true';
     const experimentalEnableAuthenticationTransfer = config.ExperimentalEnableAuthenticationTransfer === 'true';

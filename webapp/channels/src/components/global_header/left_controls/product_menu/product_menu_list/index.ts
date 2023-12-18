@@ -12,6 +12,7 @@ import {
     getConfig,
     getFirstAdminVisitMarketplaceStatus,
     getLicense,
+    getSiteName,
     isMarketplaceEnabled,
 } from 'mattermost-redux/selectors/entities/general';
 import {
@@ -48,7 +49,7 @@ function mapStateToProps(state: GlobalState) {
 
     const appDownloadLink = config.AppDownloadLink || '';
     const enableCommands = config.EnableCommands === 'true';
-    const siteName = config.SiteName || 'Mattermost';
+    const siteName = getSiteName(state);
     const enableIncomingWebhooks = config.EnableIncomingWebhooks === 'true';
     const enableOAuthServiceProvider = config.EnableOAuthServiceProvider === 'true';
     const enableOutgoingWebhooks = config.EnableOutgoingWebhooks === 'true';

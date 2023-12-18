@@ -8,7 +8,7 @@ import type {ActionCreatorsMapObject, Dispatch} from 'redux';
 import type {GlobalState} from '@mattermost/types/store';
 
 import {switchLdapToEmail} from 'mattermost-redux/actions/users';
-import {getConfig} from 'mattermost-redux/selectors/entities/general';
+import {getConfig, getSiteName} from 'mattermost-redux/selectors/entities/general';
 import type {ActionFunc, GenericAction} from 'mattermost-redux/types/actions';
 
 import {getPasswordConfig} from 'utils/utils';
@@ -18,7 +18,7 @@ import type {Props} from './claim_controller';
 
 function mapStateToProps(state: GlobalState) {
     const config = getConfig(state);
-    const siteName = config.SiteName as string;
+    const siteName = getSiteName(state);
     const ldapLoginFieldName = config.LdapLoginFieldName as string;
 
     return {

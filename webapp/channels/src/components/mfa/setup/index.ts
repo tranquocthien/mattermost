@@ -7,7 +7,7 @@ import type {Dispatch, ActionCreatorsMapObject} from 'redux';
 
 import type {GlobalState} from '@mattermost/types/store';
 
-import {getConfig} from 'mattermost-redux/selectors/entities/general';
+import {getConfig, getSiteName} from 'mattermost-redux/selectors/entities/general';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/users';
 import type {GenericAction, ActionFunc} from 'mattermost-redux/types/actions';
 
@@ -18,7 +18,7 @@ import Setup from './setup';
 function mapStateToProps(state: GlobalState) {
     const config = getConfig(state);
 
-    const siteName = config.SiteName;
+    const siteName = getSiteName(state);
     const enforceMultifactorAuthentication = config.EnforceMultifactorAuthentication === 'true';
 
     return {

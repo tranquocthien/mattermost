@@ -8,7 +8,7 @@ import type {Dispatch, ActionCreatorsMapObject} from 'redux';
 import type {ServerError} from '@mattermost/types/errors';
 
 import {resetUserPassword} from 'mattermost-redux/actions/users';
-import {getConfig} from 'mattermost-redux/selectors/entities/general';
+import {getSiteName} from 'mattermost-redux/selectors/entities/general';
 import type {GenericAction, ActionFunc} from 'mattermost-redux/types/actions';
 
 import type {GlobalState} from 'types/store';
@@ -20,7 +20,9 @@ type Actions = {
 }
 
 function mapStateToProps(state: GlobalState) {
-    return {siteName: getConfig(state).SiteName};
+    return {
+        siteName: getSiteName(state),
+    };
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<GenericAction>) => ({

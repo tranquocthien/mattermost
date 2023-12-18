@@ -10,12 +10,12 @@ import type {ServerError} from '@mattermost/types/errors';
 
 import Constants from 'utils/constants';
 
-interface Props {
+type Props = {
     location: {search: string};
     actions: {
         resetUserPassword: (token: string, newPassword: string) => Promise<{data: any; error: ServerError}>;
     };
-    siteName?: string;
+    siteName: string;
 }
 
 const PasswordResetForm = ({location, siteName, actions}: Props) => {

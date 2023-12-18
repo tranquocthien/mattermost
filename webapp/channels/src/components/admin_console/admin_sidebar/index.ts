@@ -10,7 +10,7 @@ import type {PluginsResponse} from '@mattermost/types/plugins';
 
 import {getPlugins} from 'mattermost-redux/actions/admin';
 import {getSubscriptionProduct} from 'mattermost-redux/selectors/entities/cloud';
-import {getConfig, getLicense} from 'mattermost-redux/selectors/entities/general';
+import {getConfig, getLicense, getSiteName} from 'mattermost-redux/selectors/entities/general';
 import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 import {isFirstAdmin} from 'mattermost-redux/selectors/entities/users';
 import type {ActionFunc} from 'mattermost-redux/types/actions';
@@ -29,7 +29,7 @@ function mapStateToProps(state: GlobalState) {
     const license = getLicense(state);
     const config = getConfig(state);
     const buildEnterpriseReady = config.BuildEnterpriseReady === 'true';
-    const siteName = config.SiteName;
+    const siteName = getSiteName(state);
     const adminDefinition = getAdminDefinition(state);
     const consoleAccess = getConsoleAccess(state);
     const taskListStatus = getBool(state, OnboardingTaskCategory, OnboardingTaskList.ONBOARDING_TASK_LIST_SHOW);
