@@ -47,7 +47,7 @@ func connectWebSocket(c *Context, w http.ResponseWriter, r *http.Request) {
 	}
 
 	cfg.ConnectionID = r.URL.Query().Get(connectionIDParam)
-	if cfg.ConnectionID == "" || c.AppContext.Session().UserId == "" {
+	if cfg.ConnectionID == "" {
 		// If not present, we assume client is not capable yet, or it's a fresh connection.
 		// We just create a new ID.
 		cfg.ConnectionID = model.NewId()
